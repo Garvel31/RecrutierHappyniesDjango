@@ -1,5 +1,7 @@
 from django.db import models
 
+from mixins.soft_delete import DeletableMixin
+
 
 class ProjectsType(models.Model):
     isPayType = models.BooleanField(default=False)
@@ -26,7 +28,7 @@ class WorkingCondition(models.Model):
     isOvertimeExpect = models.BooleanField(default=False)
 
 
-class Projects(models.Model):
+class Projects(DeletableMixin, models.Model):
     created = models.DateTimeField(auto_now_add=False, blank=True, null=True)
     updated = models.DateTimeField(auto_now_add=False, blank=True, null=True)
     project_name = models.CharField(max_length=101)
@@ -35,7 +37,6 @@ class Projects(models.Model):
     technology = models.CharField(max_length=100)
     func_direction = models.CharField(max_length=100)
     subject_area = models.CharField(max_length=100)
-    active = models.BooleanField(default=True)
     draft = models.BooleanField(default=False)
     project_type = models.ForeignKey(ProjectsType, related_name='projects', on_delete=models.CASCADE)
     team_info = models.ForeignKey(TeamsInfo, related_name='projects', on_delete=models.CASCADE)
