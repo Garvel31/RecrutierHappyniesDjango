@@ -41,15 +41,6 @@ class ProjectsReadSerializer(serializers.ModelSerializer):
         exclude = []
 
 
-class ProjectsArchiveSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Projects
-        exclude = []
-
-    def update(self, instance, validated_data):
-        instance.restore()
-        return super().update(instance, validated_data)
 
 
 
