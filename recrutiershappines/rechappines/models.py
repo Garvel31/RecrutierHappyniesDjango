@@ -19,7 +19,7 @@ class TeamsInfo(models.Model):
 
 
 class Technology(models.Model):
-    tech = models.CharField(max_length=100)
+    tech = models.CharField(max_length=100, primary_key=True)
 
 
 class WorkingCondition(models.Model):

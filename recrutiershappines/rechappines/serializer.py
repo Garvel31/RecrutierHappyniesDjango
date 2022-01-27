@@ -1,7 +1,9 @@
+import re
+
 from django.db import transaction
 from rest_framework import serializers
 
-from rechappines.models import Projects, TeamsInfo, ProjectsType, WorkingCondition
+from rechappines.models import Projects, TeamsInfo, ProjectsType, WorkingCondition, Technology
 
 
 class ProjectsTypeSerializer(serializers.ModelSerializer):
@@ -41,6 +43,22 @@ class ProjectsReadSerializer(serializers.ModelSerializer):
         exclude = []
 
 
+class TechnologySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Technology
+        fields = ['tech']
+
+
+class ProjectsShortInfoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Projects
+        fields = ['id',
+                  'created',
+                  'project_name',
+                  'customer',
+                  'proj_stage']
 
 
 
@@ -67,6 +85,17 @@ class ProjectsWriteSerializer(serializers.ModelSerializer):
         wc = WorkingCondition.objects.create(**working_conditions_data)
         project = Projects.objects.create(project_type=pt, team_info=ti, working_conditions=wc, **validated_data)
 
+
+        techs_from_request = re.split(", | |; ", project.technology) #сплитим все прописанные при создании этого проекта технологии
+        db_techs = Technology.objects.all() #берем все записи из таблицы Technology
+        array_db_tech=[]
+        for db_tech in db_techs:
+            array_db_tech.append(db_tech.tech)  #Берем все значения поля tech
+        for tech in techs_from_request:
+            if tech not in array_db_tech:
+                serializer = TechnologySerializer(data={'tech':f'{tech}'})
+                serializer.is_valid()
+                serializer.save()
         return project
 
     @transaction.atomic()
@@ -102,16 +131,6 @@ class ProjectsWriteSerializer(serializers.ModelSerializer):
 
         return super().update(instance, validated_data)
 
-        # instance.created = validated_data.get('created', instance.created)
-        # instance.updated = validated_data.get('updated', instance.updated)
-        # instance.project_name = validated_data.get('project_name', instance.project_name)
-        # instance.customer = validated_data.get('customer', instance.customer)
-        # instance.proj_stage = validated_data.get('proj_stage', instance.proj_stage)
-        # instance.technology = validated_data.get('technology', instance.technology)
-        # instance.func_direction = validated_data.get('func_direction', instance.func_direction)
-        # instance.subject_area = validated_data.get('subject_area', instance.subject_area)
-        # instance.draft = validated_data.get('draft', instance.draft)
-        # instance.deleted_at = validated_data.get('deleted_at', instance.deleted_at)
-        # instance.save()
+
 
 

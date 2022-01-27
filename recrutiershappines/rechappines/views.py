@@ -1,14 +1,15 @@
-from django.http import JsonResponse
-from django.shortcuts import render
+
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import generics
 from rest_framework.decorators import action
+from rechappines.models import Projects, Technology
+from rechappines.serializer import ProjectsReadSerializer, ProjectsWriteSerializer, ProjectsShortInfoSerializer, \
+    TechnologySerializer
 
-from mixins.soft_delete import DeletableMixin
-from rechappines.models import Projects
-from rechappines.serializer import ProjectsReadSerializer, ProjectsWriteSerializer
+
+class ProjectsShortInfoViewSet(viewsets.ModelViewSet):
+    queryset = Projects.objects.all()
+    serializer_class = ProjectsShortInfoSerializer
 
 
 class ProjectsArchiveViewSet(viewsets.ModelViewSet):
@@ -31,11 +32,15 @@ class ProjectsViewSet(viewsets.ModelViewSet):
             return Projects.objects.all()
         return Projects.objects_with_deleted.all()
 
-
     def get_serializer_class(self):
         if self.action in ("list", "retrieve"):
             return ProjectsReadSerializer
         return ProjectsWriteSerializer
+
+
+class TechnologyViewSet(viewsets.ModelViewSet):
+    queryset = Technology.objects.all()
+    serializer_class = TechnologySerializer
 
 
 
