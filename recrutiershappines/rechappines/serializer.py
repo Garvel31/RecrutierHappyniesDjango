@@ -1,9 +1,40 @@
+import pathlib
 import re
 
 from django.db import transaction
+from django.db.models.fields.files import FieldFile
 from rest_framework import serializers
 
-from rechappines.models import Projects, TeamsInfo, ProjectsType, WorkingCondition, Technology
+from rechappines.models import Projects, TeamsInfo, ProjectsType, WorkingCondition, Technology, FileTest
+
+
+class FileTestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FileTest
+        fields = ['file', 'file_custom_name']
+
+    @transaction.atomic()
+    def create(self, validated_data):
+        file = validated_data.pop('file')
+        file_custom_name = validated_data.pop('file_custom_name')
+
+
+        # file_path = file.name  # сохраняем путь к месту откуда загружен файл
+        path_obj = pathlib.Path(file.name)
+        # print('file_custom_name= ', file_custom_name)
+        # print("path_obj =", path_obj)
+        suffix = path_obj.suffix
+        # if file_custom_name != None:
+        #     file.name = file_custom_name + suffix  # если было введено custom_file_name генерируем новое имя файла
+        #     path_obj = pathlib.Path(file.name)
+
+        return FileTest.objects.create(
+            file=file,
+            file_path=file.name,
+            file_name=path_obj.stem,
+            file_custom_name=file_custom_name,
+            file_ext=suffix,  # path_obj.suffix,
+        )
 
 
 class ProjectsTypeSerializer(serializers.ModelSerializer):

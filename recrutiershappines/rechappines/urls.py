@@ -4,6 +4,7 @@ from django.urls import path, include, re_path
 from rechappines import views
 
 urlpatterns = [
+    path('file/', views.FileTestViewSet.as_view({'post': 'create'}), name='file'),
     path('technology/', views.TechnologyViewSet.as_view({'get': 'list'}), name='technology'),
     path('projects/info/', views.ProjectsShortInfoViewSet.as_view({'get': 'list'}), name='projects-info'),
     path('projects/archive/', views.ProjectsArchiveViewSet.as_view({'get': 'list'}), name='projects-archive'),

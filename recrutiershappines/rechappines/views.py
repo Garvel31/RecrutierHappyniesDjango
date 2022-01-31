@@ -1,10 +1,16 @@
 
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rechappines.models import Projects, Technology
+from rechappines.models import Projects, Technology, FileTest
 from rechappines.serializer import ProjectsReadSerializer, ProjectsWriteSerializer, ProjectsShortInfoSerializer, \
-    TechnologySerializer
+    TechnologySerializer, FileTestSerializer
+
+
+class FileTestViewSet(viewsets.ModelViewSet):
+    queryset = FileTest.objects.all()
+    serializer_class = FileTestSerializer
 
 
 class ProjectsShortInfoViewSet(viewsets.ModelViewSet):
@@ -27,6 +33,7 @@ class ProjectsArchiveViewSet(viewsets.ModelViewSet):
 
 class ProjectsViewSet(viewsets.ModelViewSet):
 
+    # permission_classes = (IsAuthenticated,)
     def get_queryset(self):
         if self.action in ("list", "retrieve"):
             return Projects.objects.all()

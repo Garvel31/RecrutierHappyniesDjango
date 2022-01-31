@@ -1,6 +1,36 @@
+import os
+from functools import partial
+
 from django.db import models
 
 from mixins.soft_delete import DeletableMixin
+
+
+def _update_filename(instance, filename, path):
+    path = path
+    print('custom', instance.file_custom_name)
+    print('name', instance.file_name)
+    print('file ', instance.file)
+
+    if instance.file_custom_name != None:
+        filename = instance.file_custom_name
+    else:
+        filename = instance.file_name
+
+    return os.path.join(path, filename)
+
+
+def upload_to(path):
+    return partial(_update_filename, path=path)
+
+
+class FileTest(models.Model):
+    file = models.FileField(upload_to=upload_to("storage"))
+
+    file_custom_name = models.CharField(max_length=200, null=True)
+    file_path = models.CharField(max_length=1000)
+    file_name = models.CharField(max_length=200)
+    file_ext = models.CharField(max_length=20)
 
 
 class ProjectsType(models.Model):
@@ -44,5 +74,3 @@ class Projects(DeletableMixin, models.Model):
 
     class Meta:
         ordering = ['created']
-
-
